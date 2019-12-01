@@ -2,8 +2,9 @@ const express = require('express')
 const got = require("got");
 const geolib = require("geolib");
 const childProcess = require("child_process");
-const https = require('https');
 const fs = require('fs');
+const download = require('download');
+
 
 const getFeedList = async () => {
   const info = await got("https://api.tfl.gov.uk/Place/Type/JamCam/?app_id=a20e2f12&app_key=732436bb1747a061ed9ec411023b9315", { json: true });
@@ -29,20 +30,6 @@ const getFeatureCoordRange = async () => {
 
 const app = express();
 
-const saveImageFile = (imageUrl) => {
-  return new Promise((resolve, reject) => {
-  const file = fs.createWriteStream("road.jpg");
-  console.log(imageUrl);
-  https.get(imageUrl, (response) => {
-    response.pipe(file);
-    
-  }).on('finish', function() {
-    file.close(cb);
-    resolve(true);
-  })
-})
-};
-
 const getTakenUpParkingSpaceInM = (featureCoordRange) => {
   return new Promise((resolve, reject) => {
     try{
@@ -65,7 +52,8 @@ app.get('/api/feature/:featureid/space-probability', async (req, res) => {
   const closestFeed = await findClosestFeed(featureCoordRange, allCameraFeeds);
   const feedImageUrl = closestFeed.additionalProperties.filter(props => props.key === "imageUrl")[0].value;
   const lengthOfFeature = geolib.getDistance(...featureCoordRange);
-  const isImageSaved = await saveImageFile(feedImageUrl);
+  const isImageSaved = await download(feedImageUrl).then((data)=> fs.writeFileSync('road.jpg', data));
+  console.log(isImageSaved);
   const spaceTakenUpInM = await getTakenUpParkingSpaceInM(featureCoordRange);
   const remainingLengthInFeature = lengthOfFeature-spaceTakenUpInM;
   const remainingSpaces = Math.floor(remainingLengthInFeature/4.5);
