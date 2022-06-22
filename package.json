@@ -20,7 +20,7 @@
     "download": "^7.1.0",
     "express": "^4.17.1",
     "geolib": "^3.1.0",
-    "got": "^9.6.0"
+    "got": "^11.8.5"
   },
   "devDependencies": {
     "jest": "^24.9.0",
