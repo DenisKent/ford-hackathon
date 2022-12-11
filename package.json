@@ -18,7 +18,7 @@
   "homepage": "https://github.com/ScorcherChar/fordhackathon#readme",
   "dependencies": {
     "download": "^7.1.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "geolib": "^3.1.0",
     "got": "^9.6.0"
   },
